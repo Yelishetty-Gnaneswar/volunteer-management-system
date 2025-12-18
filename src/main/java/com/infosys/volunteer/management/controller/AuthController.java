@@ -20,7 +20,6 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
-    // ✅ LOGIN (uses merged DTO)
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody EventRequestDto req,
                                    HttpSession session) {
@@ -31,8 +30,7 @@ public class AuthController {
         if (!user.getPassword().equals(req.password)) {
             throw new RuntimeException("Invalid password");
         }
-
-        // 🔐 Create session
+        
         session.setAttribute("USER_EMAIL", user.getEmailId());
 
         return ResponseEntity.ok(
@@ -44,7 +42,6 @@ public class AuthController {
         );
     }
 
-    // ✅ LOGOUT
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         session.invalidate();
