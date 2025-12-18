@@ -2,13 +2,11 @@ package com.infosys.volunteer.management.dto;
 
 public class EventRequestDto {
 
-    /* ================= COMMON ================= */
     public Integer eventId;
     public String emailId;
-    public String password;   // ✅ used for LOGIN
+    public String password;   
     public Float rating;
 
-    /* ================= EVENT CREATE / UPDATE ================= */
     public String name;
     public String description;
     public String address;
