@@ -4,8 +4,6 @@ public class AuthDTO {
     private String emailId;
     private String password;
 
-    public AuthDTO() {}
-
     public String getEmailId() { return emailId; }
     public void setEmailId(String emailId) { this.emailId = emailId; }
 

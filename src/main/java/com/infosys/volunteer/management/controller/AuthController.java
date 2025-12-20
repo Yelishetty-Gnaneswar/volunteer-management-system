@@ -1,50 +1,58 @@
 package com.infosys.volunteer.management.controller;
 
-import jakarta.servlet.http.HttpSession;
+import com.infosys.volunteer.management.dto.AuthDTO;
+import com.infosys.volunteer.management.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.infosys.volunteer.management.dto.EventRequestDto;
-import com.infosys.volunteer.management.entity.User;
-import com.infosys.volunteer.management.repository.UserRepository;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
+    // LOGIN
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody EventRequestDto req,
-                                   HttpSession session) {
+    public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
 
-        User user = userRepository.findById(req.emailId)
-                .orElseThrow(() -> new RuntimeException("Invalid email"));
-
-        if (!user.getPassword().equals(req.password)) {
-            throw new RuntimeException("Invalid password");
+        if (authDTO.getEmailId() == null || authDTO.getPassword() == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "status", "error",
+                            "message", "Email and password must not be null"
+                    ));
         }
-        
-        session.setAttribute("USER_EMAIL", user.getEmailId());
+
+        String sessionId = userService.login(authDTO);
 
         return ResponseEntity.ok(
                 Map.of(
-                        "status", "login success",
-                        "sessionId", session.getId(),
-                        "emailId", user.getEmailId()
+                        "status", "success",
+                        "sessionId", sessionId
                 )
         );
     }
 
+    // LOGOUT
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
-        return ResponseEntity.ok(Map.of("status", "logout success"));
+    public ResponseEntity<?> logout(
+            @RequestHeader("Session-Id") String sessionId) {
+
+        userService.logout(sessionId);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "Logged out successfully"
+                )
+        );
     }
 }
