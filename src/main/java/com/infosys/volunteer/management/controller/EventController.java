@@ -1,5 +1,7 @@
 package com.infosys.volunteer.management.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -28,19 +30,35 @@ public class EventController {
             @RequestHeader("Session-Id") String sessionId,
             @RequestBody EventRequestDto req) {
 
+        // 🔴 DATE VALIDATION
+        ResponseEntity<?> dateValidation = validateDates(req);
+        if (dateValidation != null) return dateValidation;
+
         return ResponseEntity.ok(
                 Map.of("eventId", eventService.create(req, sessionId))
         );
     }
 
-    // ✅ LIST EVENTS BY STATUS (PUBLIC)
-    // Example: /event/list/status/active
+    // ✅ UPDATE EVENT (ORGANISER)
+    @PutMapping("/update")
+    public ResponseEntity<?> update(
+            @RequestHeader("Session-Id") String sessionId,
+            @RequestBody EventRequestDto req) {
+
+        ResponseEntity<?> dateValidation = validateDates(req);
+        if (dateValidation != null) return dateValidation;
+
+        eventService.update(req, sessionId);
+        return ResponseEntity.ok("Event updated successfully");
+    }
+
+    // ================== OTHER APIs (UNCHANGED) ==================
+
     @GetMapping("/list/status/{status}")
     public ResponseEntity<?> listByStatus(@PathVariable String status) {
         return ResponseEntity.ok(eventService.listByStatus(status));
     }
 
-    // ✅ REGISTER FOR EVENT (VOLUNTEER)
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestHeader("Session-Id") String sessionId,
@@ -50,7 +68,6 @@ public class EventController {
         return ResponseEntity.ok("Registered");
     }
 
-    // ✅ UNREGISTER FROM EVENT (VOLUNTEER)
     @PostMapping("/unregister")
     public ResponseEntity<?> unregister(
             @RequestHeader("Session-Id") String sessionId,
@@ -60,7 +77,6 @@ public class EventController {
         return ResponseEntity.ok("Unregistered");
     }
 
-    // ✅ CHECK-IN (VOLUNTEER)
     @PostMapping("/checkin")
     public ResponseEntity<?> checkIn(
             @RequestHeader("Session-Id") String sessionId,
@@ -70,7 +86,6 @@ public class EventController {
         return ResponseEntity.ok("Check-in successful");
     }
 
-    // ✅ FEEDBACK (VOLUNTEER)
     @PostMapping("/feedback")
     public ResponseEntity<?> feedback(
             @RequestHeader("Session-Id") String sessionId,
@@ -80,7 +95,6 @@ public class EventController {
         return ResponseEntity.ok("Feedback saved");
     }
 
-    // ✅ VIEW PARTICIPANTS (ORGANISER ONLY)
     @GetMapping("/{eventId}/participants")
     public Map<String, Object> participants(
             @RequestHeader("Session-Id") String sessionId,
@@ -88,20 +102,12 @@ public class EventController {
 
         return registrationService.participants(eventId, sessionId);
     }
-    // ✅ GET EVENT BY ID
+
     @GetMapping("/list/id/{eventId}")
     public ResponseEntity<?> getById(@PathVariable Integer eventId) {
         return ResponseEntity.ok(eventService.getById(eventId));
     }
-    @PutMapping("/update")
-    public ResponseEntity<?> update(
-            @RequestHeader("Session-Id") String sessionId,
-            @RequestBody EventRequestDto req) {
 
-        eventService.update(req, sessionId);
-        return ResponseEntity.ok("Event updated successfully");
-    }
-    // ✅ DELETE EVENT (ORGANISER ONLY)
     @DeleteMapping("/delete/{eventId}")
     public ResponseEntity<?> delete(
             @RequestHeader("Session-Id") String sessionId,
@@ -111,4 +117,33 @@ public class EventController {
         return ResponseEntity.ok("Event deleted successfully");
     }
 
+    // ================== DATE VALIDATION METHOD ==================
+
+    private ResponseEntity<?> validateDates(EventRequestDto req) {
+        try {
+            if (req.startDate == null || req.endDate == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Start date and End date are required"));
+            }
+
+            LocalDate start = LocalDate.parse(req.startDate);
+            LocalDate end = LocalDate.parse(req.endDate);
+
+            if (start.isBefore(LocalDate.now())) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Start date cannot be in the past"));
+            }
+
+            if (end.isBefore(start)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "End date must be after Start date"));
+            }
+
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Invalid date format. Use YYYY-MM-DD"));
+        }
+
+        return null; // ✅ valid
+    }
 }
