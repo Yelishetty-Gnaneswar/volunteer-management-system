@@ -57,7 +57,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Event event = eventRepo.findById(req.eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        // ✅ Allow registration ONLY for UPCOMING events
+        //  Allow registration ONLY for UPCOMING events
         LocalDate today = LocalDate.now();
         LocalDate start = event.getEventStartDate().toLocalDate();
 
@@ -162,7 +162,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             );
         }
 
-        // ✅ SHOW ALL REGISTERED volunteers (not only checked-in)
+        //  SHOW ALL REGISTERED volunteers (not only checked-in)
         List<String> volunteers = repo.findAll().stream()
                 .filter(r -> r.getEventId().equals(eventId))
                 .filter(r -> "REGISTERED".equals(r.getStatus()))
