@@ -1,6 +1,8 @@
 package com.infosys.volunteer.management.service.impl;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // ✅ REGISTER
+    // ================== REGISTER ==================
     @Override
     public void register(EventRequestDto req, String sessionId) {
 
@@ -50,6 +52,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (!"VOLUNTEER".equalsIgnoreCase(user.getUserRole())) {
             throw new RuntimeException("Only volunteer can register");
+        }
+
+        Event event = eventRepo.findById(req.eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        // ✅ Allow registration ONLY for UPCOMING events
+        LocalDate today = LocalDate.now();
+        LocalDate start = event.getEventStartDate().toLocalDate();
+
+        if (!today.isBefore(start)) {
+            throw new RuntimeException(
+                    "Registration allowed only for UPCOMING events"
+            );
+        }
+
+        // prevent duplicate registration
+        Registration.RegistrationKey key = new Registration.RegistrationKey();
+        key.setVolunteerId(user.getEmailId());
+        key.setEventId(req.eventId);
+
+        if (repo.existsById(key)) {
+            throw new RuntimeException("Already registered");
         }
 
         Registration r = new Registration();
@@ -61,7 +85,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         repo.save(r);
     }
 
-    // ✅ UNREGISTER
+    // ================== UNREGISTER ==================
     @Override
     public void unregister(EventRequestDto req, String sessionId) {
 
@@ -78,7 +102,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         repo.save(r);
     }
 
-    // ✅ CHECK-IN
+    // ================== CHECK-IN ==================
     @Override
     public void checkIn(EventRequestDto req, String sessionId) {
 
@@ -95,7 +119,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         repo.save(r);
     }
 
-    // ✅ FEEDBACK
+    // ================== FEEDBACK ==================
     @Override
     public void feedback(EventRequestDto req, String sessionId) {
 
@@ -113,14 +137,16 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RuntimeException("Not registered"));
 
         if (!"REGISTERED".equals(r.getStatus())) {
-            throw new RuntimeException("Withdrawn volunteer cannot give feedback");
+            throw new RuntimeException(
+                    "Withdrawn volunteer cannot give feedback"
+            );
         }
 
         r.setRating(req.rating);
         repo.save(r);
     }
 
-    // ✅ PARTICIPANTS (ORGANISER ONLY)
+    // ================== PARTICIPANTS (ORGANISER ONLY) ==================
     @Override
     public Map<String, Object> participants(Integer eventId, String sessionId) {
 
@@ -129,13 +155,17 @@ public class RegistrationServiceImpl implements RegistrationService {
         Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        if (!event.getOrganiser().getEmailId().equals(organiser.getEmailId())) {
-            throw new RuntimeException("Only organiser can view participants");
+        if (!event.getOrganiser().getEmailId()
+                .equals(organiser.getEmailId())) {
+            throw new RuntimeException(
+                    "Only organiser can view participants"
+            );
         }
 
+        // ✅ SHOW ALL REGISTERED volunteers (not only checked-in)
         List<String> volunteers = repo.findAll().stream()
                 .filter(r -> r.getEventId().equals(eventId))
-                .filter(r -> Boolean.TRUE.equals(r.getCheckIn()))
+                .filter(r -> "REGISTERED".equals(r.getStatus()))
                 .map(Registration::getVolunteerId)
                 .collect(Collectors.toList());
 
