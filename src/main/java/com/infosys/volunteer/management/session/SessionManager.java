@@ -1,7 +1,6 @@
 package com.infosys.volunteer.management.session;
 
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
 
     private final Map<String, String> sessions = new ConcurrentHashMap<>();
-    // key = sessionId, value = emailId
 
     public String createSession(String emailId) {
         String sessionId = UUID.randomUUID().toString();
@@ -19,16 +17,18 @@ public class SessionManager {
     }
 
     public boolean isValidSession(String sessionId) {
-        return sessionId != null && sessions.containsKey(sessionId);
+        return sessionId != null && !sessionId.trim().isEmpty()
+                && sessions.containsKey(sessionId.trim());
     }
 
     public void destroySession(String sessionId) {
         if (sessionId != null) {
-            sessions.remove(sessionId);
+            sessions.remove(sessionId.trim());
         }
     }
 
     public String getEmailBySession(String sessionId) {
-        return sessions.get(sessionId);
+        if (sessionId == null) return null;
+        return sessions.get(sessionId.trim());
     }
 }

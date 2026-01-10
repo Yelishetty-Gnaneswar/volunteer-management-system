@@ -49,6 +49,12 @@ public class Registration {
         this.status = status;
     }
 
+    // ✅ REQUIRED FOR SERVICE LAYER
+    public Boolean isCheckIn() {
+        return checkIn != null && checkIn;
+    }
+
+    // optional (can stay)
     public Boolean getCheckIn() {
         return checkIn;
     }

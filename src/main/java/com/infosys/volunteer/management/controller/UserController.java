@@ -1,5 +1,6 @@
 package com.infosys.volunteer.management.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,10 +29,27 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userDTO));
     }
 
-    // ✅ RESET PASSWORD
-    @PutMapping("/reset-password")
+    // ✅ RESET PASSWORD (SAFE FIX)
+    @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.resetPassword(userDTO));
+
+        if (userDTO == null ||
+                userDTO.getEmailId() == null ||
+                userDTO.getEmailId().trim().isEmpty() ||
+                userDTO.getNewPassword() == null ||
+                userDTO.getNewPassword().trim().isEmpty()) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Email and new password are required");
+        }
+
+        String result = userService.resetPassword(
+                userDTO.getEmailId().trim(),
+                userDTO.getNewPassword().trim()
+        );
+
+        return ResponseEntity.ok(result);
     }
 
     // ✅ GET PROFILE

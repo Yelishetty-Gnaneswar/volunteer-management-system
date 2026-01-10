@@ -131,4 +131,5 @@ public class Event {
     public void setOrganiser(User organiser) {
         this.organiser = organiser;
     }
+
 }

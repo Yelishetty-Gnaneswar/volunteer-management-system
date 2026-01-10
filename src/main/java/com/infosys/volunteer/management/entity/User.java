@@ -14,6 +14,10 @@ public class User {
     @Column(name = "Password", length = 100, nullable = false)
     private String password;
 
+    // ✅ PERMANENT PROFILE FIELD
+    @Column(name = "Name", length = 100)
+    private String name;
+
     @Column(name = "Phone_No", length = 20, nullable = false)
     private String phoneNo;
 
@@ -28,21 +32,62 @@ public class User {
 
     public User() {}
 
-    public String getEmailId() { return emailId; }
-    public void setEmailId(String emailId) { this.emailId = emailId; }
+    /* ================= GETTERS & SETTERS ================= */
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getEmailId() {
+        return emailId;
+    }
 
-    public String getPhoneNo() { return phoneNo; }
-    public void setPhoneNo(String phoneNo) { this.phoneNo = phoneNo; }
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getPassword() {
+        return password;
+    }
 
-    public String getUserRole() { return userRole; }
-    public void setUserRole(String userRole) { this.userRole = userRole; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public LocalDateTime getCreatedTime() { return createdTime; }
-    public void setCreatedTime(LocalDateTime createdTime) { this.createdTime = createdTime; }
+    // ✅ NAME (FIXED – ONLY ONCE)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
 }

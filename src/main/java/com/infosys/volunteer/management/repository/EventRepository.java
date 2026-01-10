@@ -6,4 +6,6 @@ import com.infosys.volunteer.management.entity.Event;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findByRegistrationAllowed(Boolean registrationAllowed);
+    List<Event> findAll();
+
 }

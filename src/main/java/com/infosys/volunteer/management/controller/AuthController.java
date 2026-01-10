@@ -1,8 +1,8 @@
 package com.infosys.volunteer.management.controller;
 
 import com.infosys.volunteer.management.dto.AuthDTO;
+import com.infosys.volunteer.management.dto.ResetPasswordDTO;
 import com.infosys.volunteer.management.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,41 +18,24 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
-
-        if (authDTO.getEmailId() == null || authDTO.getPassword() == null) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "status", "error",
-                            "message", "Email and password must not be null"
-                    ));
-        }
-
         String sessionId = userService.login(authDTO);
-
-        return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "sessionId", sessionId
-                )
-        );
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "sessionId", sessionId
+        ));
     }
 
-    // LOGOUT
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-            @RequestHeader("Session-Id") String sessionId) {
-
+    public ResponseEntity<?> logout(@RequestHeader("sessionId") String sessionId) {
         userService.logout(sessionId);
+        return ResponseEntity.ok(Map.of("message", "Logged out"));
+    }
 
-        return ResponseEntity.ok(
-                Map.of(
-                        "status", "success",
-                        "message", "Logged out successfully"
-                )
-        );
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> reset(@RequestBody ResetPasswordDTO dto) {
+        userService.resetPassword(dto.getEmailId(), dto.getNewPassword());
+        return ResponseEntity.ok("Password reset successful");
     }
 }
