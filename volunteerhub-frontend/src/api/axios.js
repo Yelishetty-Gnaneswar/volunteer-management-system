@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.https://volunteerhub-backend.onrender.com, // ✅ FIXED (ONLY CHANGE)
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const sessionId = localStorage.getItem("sessionId");
   if (sessionId) {
-    config.headers["sessionId"] = sessionId; // ✅ FINAL
+    config.headers["sessionId"] = sessionId; // ✅ FINAL (unchanged)
   }
   return config;
 });
