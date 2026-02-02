@@ -1,16 +1,16 @@
-# Use Java 17 base image
-FROM eclipse-temurin:17-jdk-alpine
+# Use stable Java 17 image (Render-friendly)
+FROM openjdk:17-jdk-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper & pom.xml first (better caching)
+# Copy Maven wrapper and pom
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Download dependencies
-RUN chmod +x mvnw && ./mvnw dependency:go-offline
+# Download dependencies (cached layer)
+RUN ./mvnw dependency:go-offline
 
 # Copy source code
 COPY src src
@@ -18,8 +18,8 @@ COPY src src
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Expose Spring Boot port
+# Expose port
 EXPOSE 8080
 
-# Run the jar
+# Run the application
 CMD ["java", "-jar", "target/volunteer-management-system-0.0.1-SNAPSHOT.jar"]
