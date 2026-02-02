@@ -22,9 +22,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem("sessionId");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
+      localStorage.clear();
     }
     return Promise.reject(error);
   }
