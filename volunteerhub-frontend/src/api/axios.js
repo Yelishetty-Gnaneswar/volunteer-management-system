@@ -1,14 +1,13 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.https://volunteer-management-system-isp4.onrender.com,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
   withCredentials: false,
 });
 
-/* ================= REQUEST INTERCEPTOR ================= */
 api.interceptors.request.use((config) => {
   const sessionId = localStorage.getItem("sessionId");
   if (sessionId) {
@@ -17,7 +16,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/* ================= RESPONSE INTERCEPTOR ================= */
 api.interceptors.response.use(
   (response) => response,
   (error) => {
