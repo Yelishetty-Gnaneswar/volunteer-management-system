@@ -27,7 +27,6 @@ axiosInstance.interceptors.request.use(
     const sessionId = localStorage.getItem("sessionId");
 
     if (sessionId) {
-      // ✅ REQUIRED for your backend
       config.headers["sessionId"] = sessionId;
     }
 
@@ -55,4 +54,5 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default api;
+// ✅ THIS IS THE FIX
+export default axiosInstance;
