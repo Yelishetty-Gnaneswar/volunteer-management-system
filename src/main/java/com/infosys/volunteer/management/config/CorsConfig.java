@@ -16,14 +16,15 @@ public class CorsConfig {
 
                 CorsConfiguration config = new CorsConfiguration();
 
-                // ✅ SUPPORT MULTIPLE ORIGINS VIA ENV (VERY IMPORTANT)
+                // ✅ USE PATTERNS FOR WILDCARD SUPPORT (VERCEL/LOCAL)
                 String allowedOrigins = System.getenv("ALLOWED_ORIGINS");
                 if (allowedOrigins != null && !allowedOrigins.isBlank()) {
-                        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+                        config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
                 } else {
-                        config.setAllowedOrigins(List.of(
+                        config.setAllowedOriginPatterns(List.of(
                                         "http://localhost:5173",
-                                        "https://volunteer-management-system-blush.vercel.app"));
+                                        "http://127.0.0.1:5173",
+                                        "https://*.vercel.app"));
                 }
 
                 config.setAllowedMethods(List.of(
