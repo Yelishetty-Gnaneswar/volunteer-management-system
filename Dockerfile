@@ -1,24 +1,16 @@
-# Use stable Java 17 image (Render-friendly)
-FROM openjdk:17-jdk-slim
+# Use stable Java 17 image
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper and pom
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-
-# Download dependencies (cached layer)
-RUN ./mvnw dependency:go-offline
-
-# Copy source code
-COPY src src
+# Copy Maven wrapper & pom.xml
+COPY . .
 
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Expose port
+# Expose port (Spring Boot default)
 EXPOSE 8080
 
 # Run the application
