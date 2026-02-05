@@ -10,6 +10,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+
+// ✅ REQUIRED FOR VERCEL → RENDER COMMUNICATION
+@CrossOrigin(
+        origins = {
+                "http://localhost:5173",
+                "https://volunteer-management-system-blush.vercel.app"
+        },
+        allowCredentials = "true"
+)
 public class AuthController {
 
     private final UserService userService;
@@ -20,22 +29,39 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
+
         String sessionId = userService.login(authDTO);
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "sessionId", sessionId
-        ));
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "sessionId", sessionId
+                )
+        );
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("sessionId") String sessionId) {
+    public ResponseEntity<?> logout(
+            @RequestHeader("sessionId") String sessionId
+    ) {
+
         userService.logout(sessionId);
-        return ResponseEntity.ok(Map.of("message", "Logged out"));
+
+        return ResponseEntity.ok(
+                Map.of("message", "Logged out")
+        );
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> reset(@RequestBody ResetPasswordDTO dto) {
-        userService.resetPassword(dto.getEmailId(), dto.getNewPassword());
+    public ResponseEntity<?> reset(
+            @RequestBody ResetPasswordDTO dto
+    ) {
+
+        userService.resetPassword(
+                dto.getEmailId(),
+                dto.getNewPassword()
+        );
+
         return ResponseEntity.ok("Password reset successful");
     }
 }

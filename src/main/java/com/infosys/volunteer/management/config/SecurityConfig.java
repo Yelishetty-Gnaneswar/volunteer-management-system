@@ -23,17 +23,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ EXISTING (UNCHANGED)
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/user/**",
-                                "/event/**",
-
-                                // ✅ ADDED (FIXES 403 PROFILE ISSUE)
-                                "/api/profile/**"
+                                "/api/profile/**",
+                                "/event/**"
                         ).permitAll()
-
-                        // 🔒 EVERYTHING ELSE PROTECTED
                         .anyRequest().authenticated()
                 );
 
