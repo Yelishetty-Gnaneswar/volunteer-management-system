@@ -1,58 +1,45 @@
 import axios from "axios";
 
 /*
-  ✅ Automatically selects backend URL
-  - Local development  → localhost
-  - Production (Vercel) → Render backend
+  ✅ Correct backend selection
 */
 const BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:8080"
     : "https://volunteer-management-system-isp4.onrender.com";
 
-const axiosInstance = axios.create({
+const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-
-  // ❌ We are NOT using cookies
-  // ✅ We use sessionId header instead
-  withCredentials: false,
+  withCredentials: false, // we use sessionId header
 });
 
-/* ================= REQUEST INTERCEPTOR ================= */
-axiosInstance.interceptors.request.use(
+/* ===== REQUEST INTERCEPTOR ===== */
+api.interceptors.request.use(
   (config) => {
     const sessionId = localStorage.getItem("sessionId");
-
     if (sessionId) {
       config.headers["sessionId"] = sessionId;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-/* ================= RESPONSE INTERCEPTOR ================= */
-axiosInstance.interceptors.response.use(
+/* ===== RESPONSE INTERCEPTOR ===== */
+api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (
-      error.response?.status === 401 ||
-      error.response?.status === 403
-    ) {
-      console.warn("Session expired or unauthorized");
-
+    if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem("sessionId");
-      localStorage.removeItem("user");
       localStorage.removeItem("role");
+      localStorage.removeItem("email");
+      window.location.href = "/auth";
     }
-
     return Promise.reject(error);
   }
 );
 
-// ✅ THIS IS THE FIX
-export default axiosInstance;
+export default api;

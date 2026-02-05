@@ -1,5 +1,4 @@
 import api from "./axios";
-import axios from "axios";
 
 /* ================= ORGANIZER ================= */
 
@@ -24,15 +23,12 @@ export const createEvent = async (eventData) => {
 
 export const updateEvent = async (payload) => {
   const sessionId = localStorage.getItem("sessionId");
-
   if (!sessionId) throw new Error("Session expired");
 
   const res = await api.put(
     "/event/update",
     payload,
-    {
-      headers: { sessionId },
-    }
+    { headers: { sessionId } }
   );
 
   return res.data;
@@ -43,48 +39,33 @@ export const deleteEvent = async (eventId) => {
   return res.data;
 };
 
-/* ================= PARTICIPANTS (✅ FIXED) ================= */
+/* ================= PARTICIPANTS ================= */
 
 export const getParticipants = async (eventId) => {
   const sessionId = localStorage.getItem("sessionId");
-
   if (!sessionId) throw new Error("Session expired");
 
   const res = await api.get(
     `/event/${eventId}/participants`,
-    {
-      headers: {
-        sessionId,
-      },
-    }
+    { headers: { sessionId } }
   );
 
   return res.data;
 };
-
 
 /* ================= VOLUNTEER ================= */
 
 export const registerEvent = async (eventId) => {
   const sessionId = localStorage.getItem("sessionId");
 
-  console.log("REGISTER eventId =", eventId);
-  console.log("REGISTER sessionId =", sessionId);
-
   if (!sessionId) throw new Error("Session expired");
   if (!eventId) throw new Error("eventId missing");
 
-  const res = await axios({
-    method: "post",
-    url: "http://localhost:8080/event/register",
-    headers: {
-      "Content-Type": "application/json",
-      sessionId: sessionId,
-    },
-    data: {
-      eventId: Number(eventId),
-    },
-  });
+  const res = await api.post(
+    "/event/register",
+    { eventId: Number(eventId) },
+    { headers: { sessionId } }
+  );
 
   return res.data;
 };
@@ -138,7 +119,6 @@ export const submitEventFeedback = async (payload) => {
 
 export const checkInVolunteer = async ({ eventId, emailId }) => {
   const sessionId = localStorage.getItem("sessionId");
-
   if (!sessionId) throw new Error("Session expired");
 
   const res = await api.post(
@@ -166,35 +146,20 @@ export const getMyRegisteredEvents = async () => {
   const res = await api.get("/event/my-registrations");
   return res.data;
 };
-/* ================= EVENT BY ID (FIX FOR EDIT EVENT) ================= */
+
+/* ================= EVENT BY ID ================= */
 
 export const getEventById = async (eventId) => {
   const sessionId = localStorage.getItem("sessionId");
-
   if (!sessionId) throw new Error("Session expired");
 
   const res = await api.get(
     `/event/list/id/${eventId}`,
-    {
-      headers: { sessionId }
-    }
+    { headers: { sessionId } }
   );
 
   return res.data;
 };
-const refresh = async (nextTab, registeredEventId = null) => {
-  if (registeredEventId) {
-    setMyMap((prev) => ({
-      ...prev,
-      [registeredEventId]: {
-        registered: true,
-        rating: null,
-      },
-    }));
-  }
-
-  if (nextTab) setActiveTab(nextTab);
-
-  await loadMyEvents();
-  await loadEvents();
-};
+git add .
+git commit -m "Fix eventApi to use single axios instance"
+git push origin main
