@@ -1,28 +1,50 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:8080",
+/*
+  ✅ Automatically selects backend URL
+  - Local development  → localhost
+  - Production (Vercel) → Render backend
+*/
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://volunteer-management-system-isp4.onrender.com";
+
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+
+  // ❌ We are NOT using cookies
+  // ✅ We use sessionId header instead
   withCredentials: false,
 });
 
 /* ================= REQUEST INTERCEPTOR ================= */
-api.interceptors.request.use((config) => {
-  const sessionId = localStorage.getItem("sessionId");
-  if (sessionId) {
-    config.headers["sessionId"] = sessionId; // ✅ FINAL
-  }
-  return config;
-});
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const sessionId = localStorage.getItem("sessionId");
+
+    if (sessionId) {
+      // ✅ REQUIRED for your backend
+      config.headers["sessionId"] = sessionId;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 /* ================= RESPONSE INTERCEPTOR ================= */
-api.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn("Session expired");
+    if (
+      error.response?.status === 401 ||
+      error.response?.status === 403
+    ) {
+      console.warn("Session expired or unauthorized");
 
       localStorage.removeItem("sessionId");
       localStorage.removeItem("user");
