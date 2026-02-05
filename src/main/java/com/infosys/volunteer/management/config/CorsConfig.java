@@ -11,30 +11,32 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Bean
-    public CorsFilter corsFilter() {
+        @Bean
+        public CorsFilter corsFilter() {
 
-        CorsConfiguration config = new CorsConfiguration();
+                CorsConfiguration config = new CorsConfiguration();
 
-        // ✅ EXACT FRONTEND URL (VERY IMPORTANT)
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "https://volunteer-management-system-blush.vercel.app"
-        ));
+                // ✅ SUPPORT MULTIPLE ORIGINS VIA ENV (VERY IMPORTANT)
+                String allowedOrigins = System.getenv("ALLOWED_ORIGINS");
+                if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+                        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+                } else {
+                        config.setAllowedOrigins(List.of(
+                                        "http://localhost:5173",
+                                        "https://volunteer-management-system-blush.vercel.app"));
+                }
 
-        config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
+                config.setAllowedMethods(List.of(
+                                "GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        config.setAllowedHeaders(List.of("*"));
+                config.setAllowedHeaders(List.of("*"));
 
-        // ✅ REQUIRED for session / cookies / headers
-        config.setAllowCredentials(true);
+                // ✅ REQUIRED for session / cookies / headers
+                config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
-    }
+                return new CorsFilter(source);
+        }
 }

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://volunteer-management-system-isp4.onrender.com",
 });
 
 // 🔐 Attach token to every request
