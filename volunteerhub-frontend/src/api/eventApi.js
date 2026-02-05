@@ -160,6 +160,3 @@ export const getEventById = async (eventId) => {
 
   return res.data;
 };
-git add .
-git commit -m "Fix eventApi to use single axios instance"
-git push origin main

@@ -4,9 +4,10 @@ import axios from "axios";
   ✅ Correct backend selection
 */
 const BASE_URL =
-  window.location.hostname === "localhost"
+  import.meta.env.VITE_API_BASE_URL ||
+  (window.location.hostname === "localhost"
     ? "http://localhost:8080"
-    : "https://volunteer-management-system-isp4.onrender.com";
+    : "https://volunteer-management-system-isp4.onrender.com");
 
 const api = axios.create({
   baseURL: BASE_URL,
