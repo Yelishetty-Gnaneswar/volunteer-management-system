@@ -3,11 +3,13 @@ import api from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getMyProfile } from "../../api/eventApi";
+import { useAuth } from "../../context/AuthContext";
 
 const LoginForm = ({ onForgot }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,15 +24,20 @@ const LoginForm = ({ onForgot }) => {
 
       const sessionId = res.data.sessionId;
 
-      localStorage.setItem("sessionId", sessionId);
-      localStorage.setItem("email", cleanEmail);
-
       const profile = await getMyProfile(cleanEmail);
       const role = profile.userRole || profile.role;
 
       if (!role) throw new Error("Role not found");
 
+      // ✅ Centralized login
+      login({
+        email: cleanEmail,
+        role: role,
+        sessionId: sessionId
+      });
+
       localStorage.setItem("role", role);
+      localStorage.setItem("email", cleanEmail);
       toast.success(`Login successful as ${role}`);
 
       navigate(

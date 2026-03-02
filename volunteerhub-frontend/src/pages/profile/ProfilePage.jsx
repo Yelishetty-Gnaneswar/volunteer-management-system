@@ -32,11 +32,7 @@ const ProfilePage = () => {
   /* ===== LOAD PROFILE ===== */
   const loadProfile = async () => {
     try {
-      const res = await api.get("/api/profile", {
-        headers: {
-          sessionId: localStorage.getItem("sessionId"),
-        },
-      });
+      const res = await api.get("/api/profile");
       setProfile(res.data);
     } catch {
       toast.error("Failed to load profile");
@@ -47,11 +43,7 @@ const ProfilePage = () => {
   const saveProfile = async () => {
     try {
       setLoading(true);
-      await api.put("/api/profile", profile, {
-        headers: {
-          sessionId: localStorage.getItem("sessionId"),
-        },
-      });
+      await api.put("/api/profile", profile);
       toast.success("Profile updated successfully");
     } catch {
       toast.error("Update failed");

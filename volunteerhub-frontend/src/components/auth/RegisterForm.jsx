@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 const RegisterForm = () => {
   const [role, setRole] = useState("VOLUNTEER");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
@@ -14,11 +15,12 @@ const RegisterForm = () => {
 
     try {
       await api.post("/api/user/register", {
+        name: name,                // ✅ ADDED
         emailId: email,
         password: password,
-        phoneNo: phoneNo,          // ✅ FIX
+        phoneNo: phoneNo,
         address: address,
-        userRole: role,            // ✅ FIX
+        userRole: role,
       });
 
       toast.success("Account created successfully. Please login.");
@@ -36,11 +38,10 @@ const RegisterForm = () => {
         <button
           type="button"
           onClick={() => setRole("VOLUNTEER")}
-          className={`flex-1 py-2 rounded-lg ${
-            role === "VOLUNTEER"
-              ? "bg-blue-100 text-blue-600 font-semibold"
-              : "border"
-          }`}
+          className={`flex-1 py-2 rounded-lg ${role === "VOLUNTEER"
+            ? "bg-blue-100 text-blue-600 font-semibold"
+            : "border"
+            }`}
         >
           Volunteer
         </button>
@@ -48,14 +49,26 @@ const RegisterForm = () => {
         <button
           type="button"
           onClick={() => setRole("ORGANIZER")}
-          className={`flex-1 py-2 rounded-lg ${
-            role === "ORGANIZER"
-              ? "bg-green-100 text-green-600 font-semibold"
-              : "border"
-          }`}
+          className={`flex-1 py-2 rounded-lg ${role === "ORGANIZER"
+            ? "bg-green-100 text-green-600 font-semibold"
+            : "border"
+            }`}
         >
           Organizer
         </button>
+      </div>
+      {/* Name */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-gray-700">
+          Full Name
+        </label>
+        <input
+          type="text"
+          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          placeholder="Enter your full name"
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
       </div>
 
       {/* Email */}

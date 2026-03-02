@@ -4,17 +4,17 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // { email, role }
-  const [token, setToken] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // 🔁 Restore auth on refresh
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    const storedSessionId = localStorage.getItem("sessionId");
 
-    if (storedUser && storedToken) {
+    if (storedUser && storedSessionId) {
       setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+      setSessionId(storedSessionId);
     }
 
     setLoading(false);
@@ -27,28 +27,28 @@ export const AuthProvider = ({ children }) => {
     };
 
     setUser(userData);
-    setToken(authData.token);
+    setSessionId(authData.sessionId);
 
-    localStorage.setItem("token", authData.token);
+    localStorage.setItem("sessionId", authData.sessionId);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    setToken(null);
+    setSessionId(null);
 
-    // ❌ DO NOT clear everything
-    localStorage.removeItem("token");
+    localStorage.removeItem("sessionId");
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
   };
 
-  // ⏳ Prevent rendering before auth restore
   if (loading) {
-    return null; // or <Loader />
+    return null;
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, sessionId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

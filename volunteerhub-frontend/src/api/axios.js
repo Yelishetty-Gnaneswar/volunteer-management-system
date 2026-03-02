@@ -14,7 +14,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: false, // we use sessionId header
+  withCredentials: true, // ✅ MATCH BACKEND
 });
 
 /* ===== REQUEST INTERCEPTOR ===== */

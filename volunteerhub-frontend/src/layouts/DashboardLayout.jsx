@@ -2,10 +2,12 @@ import { Bell, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useNotificationStore } from "../utils/notificationStore";
+import { useAuth } from "../context/AuthContext";
 
 export default function DashboardLayout({ title, children }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { logout: authLogout } = useAuth();
 
   const notifications = useNotificationStore(
     (state) => state.notifications
@@ -15,7 +17,7 @@ export default function DashboardLayout({ title, children }) {
   );
 
   const logout = () => {
-    localStorage.clear();
+    authLogout();
     navigate("/login");
   };
 
@@ -68,9 +70,8 @@ export default function DashboardLayout({ title, children }) {
                   {notifications.map((n) => (
                     <li
                       key={n.id}
-                      className={`px-4 py-3 border-b text-sm hover:bg-gray-50 ${
-                        !n.read ? "bg-indigo-50 font-medium" : ""
-                      }`}
+                      className={`px-4 py-3 border-b text-sm hover:bg-gray-50 ${!n.read ? "bg-indigo-50 font-medium" : ""
+                        }`}
                     >
                       <p>{n.message}</p>
                       <p className="text-xs text-gray-400 mt-1">

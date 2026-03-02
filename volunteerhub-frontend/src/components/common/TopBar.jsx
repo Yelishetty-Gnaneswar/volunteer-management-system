@@ -3,10 +3,12 @@ import { Bell, User, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { markAllRead } from "../../utils/notificationStore";
+import { useAuth } from "../../context/AuthContext";
 
 const TopBar = ({ profile, notifications }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { logout: authLogout } = useAuth();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -19,7 +21,7 @@ const TopBar = ({ profile, notifications }) => {
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.clear();
+      authLogout();
       navigate("/login");
     }
   };
@@ -81,9 +83,8 @@ const TopBar = ({ profile, notifications }) => {
                 notifications.map(n => (
                   <div
                     key={n.id}
-                    className={`px-4 py-3 text-sm border-b ${
-                      n.read ? "bg-white" : "bg-indigo-50"
-                    }`}
+                    className={`px-4 py-3 text-sm border-b ${n.read ? "bg-white" : "bg-indigo-50"
+                      }`}
                   >
                     <p className="text-gray-800">{n.message}</p>
                     <p className="text-xs text-gray-400 mt-1">
